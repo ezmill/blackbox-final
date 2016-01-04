@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="icons/pe-icon-7-stroke/css/pe-icon-7-stroke.css">
+		<style>
+			@font-face {
+			  font-family: "Knockout";
+			  src: url("assets/fonts/knockout.otf");
+			  font-weight: normal;
+			  font-style: normal;
+			}
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				margin: 0px;
+			}
+			#overlay{
+
+			}
+			.button{
+		        border: none;
+		        display: inline-block;
+		        font-family: "Knockout";
+		        font-size: 19px;
+		        line-height: 19px;
+		        vertical-align: middle;
+		        padding: 7px 10px;
+		        letter-spacing: 0.1em;
+		        background-color: #ffffff;
+		        color: #000000;
+		        text-transform: uppercase;
+		        box-sizing: border-box;
+		        outline: none;
+			}
+			@media (max-width: 767px) and (min-width: 0){
+				.button {
+				    font-size: 15px;
+				    line-height: 15px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="BB-container">
+		</div>
+		<script src="scripts/js/three.min.js"></script>
+		<script src="scripts/js/soundjs-0.6.2.min.js"></script>
+		<script src="scripts/js/CustomShaders2.js"></script>
+		<script src="scripts/js/blackbox.js"></script>
+		<script>
+		window.DEBUG = true
+			var blackboxEl = document.getElementById('BB-container')
+			var loadedItems = 0;
+			mask1 = new Image();
+			mask1.src = "assets/textures/1/mask1.png";
+			mask2 = new Image();
+			mask2.src = "assets/textures/1/mask2.png";
+			mask3 = new Image();
+			mask3.src = "assets/textures/1/mask3.png";
+			origImg = new Image();
+			origImg.src ="assets/textures/1/texture.jpg"
+			inputImg = new Image();
+			inputImg.src ="assets/textures/1/texture.jpg"
+
+		    mask1.addEventListener("load", checkLoading);
+		    mask2.addEventListener("load", checkLoading);
+		    mask3.addEventListener("load", checkLoading);
+		    origImg.addEventListener("load", checkLoading);
+		    inputImg.addEventListener("load", checkLoading);
+		    function checkLoading(){
+		        ++loadedItems;
+		        if(loadedItems >= 5){
+		        	init();
+		        }
+		    }
+			function init(){
+				var canvas = document.createElement('canvas')
+				canvas.width = origImg.width;
+				canvas.height = origImg.height;
+				var ctx = canvas.getContext('2d')
+				ctx.drawImage(origImg, 0, 0, canvas.width, canvas.height);
+				orig_base64 = canvas.toDataURL();
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(mask1, 0, 0, canvas.width, canvas.height);
+				mask1_base64 = canvas.toDataURL();
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(mask2, 0, 0, canvas.width, canvas.height);
+				mask2_base64 = canvas.toDataURL();
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(mask3, 0, 0, canvas.width, canvas.height);
+				mask3_base64 = canvas.toDataURL();
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+				ctx.drawImage(inputImg, 0, 0, canvas.width, canvas.height);
+				input_base64 = canvas.toDataURL();
+				ctx.clearRect(0,0,canvas.width, canvas.height);
+                var sources = {
+                    input: input_base64,
+                    orig: orig_base64,
+                    masks: [mask1_base64, mask2_base64, mask3_base64]
+                }
+                var size = {
+                    w: origImg.width,
+                    h: origImg.height,
+                    margin: 1000
+                }
+                var cbs = {
+                    save: onCompleteBlackbox,
+                    info: null
+                }
+
+                blackbox(blackboxEl, sources, size, cbs)
+			}
+
+			function onCompleteBlackbox (err, inputImage, base64) {
+			    if (err) { console.error(err); return }
+			    var image = new Image();
+			    image.src = inputImage;
+			    image.onload = function(){
+				    document.body.appendChild(image);
+			    }
+			}
+		</script>
+	</body>
+</html>
