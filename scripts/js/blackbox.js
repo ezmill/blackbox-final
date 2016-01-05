@@ -165,6 +165,7 @@ function blackbox(el, sources, size, cbs) {
             soundFX.push(sound);
         }
         backingTrack = new SoundEffect(PATH + "audio/main.mp3", "main", 0.25);
+        backingTrack.loaded = true;
         backingTrack.fadeIn();
     }
     function createEffect() {
