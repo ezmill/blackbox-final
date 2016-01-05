@@ -68,9 +68,21 @@ function blackbox(el, sources, size, cbs) {
     var effectIndex = 0;
     var glitchShaderSeed;
     var id;
-    var effects = ["warp", "revert", "rgb shift", "oil paint", "repos", "flow", "warp flow", "curves", "neon glow"];
-    var loadedItems = 0;
+    var soundFX = [];
     var backingTrack;
+    var effects = ["warp", "revert", "rgb shift", "oil paint", "repos", "flow", "warp flow", "curves", "neon glow"];
+    shuffle(effects);
+    insertRevert(effects);
+    // createSoundEffects(effects);
+    if (!createjs.Sound.initializeDefaultPlugins()) {return;}
+    for(var i = 0; i < effects.length; i++){
+        var src = PATH + "audio/" + effects[i] + ".mp3";
+        var sound = new SoundEffect(src, effects[i], 1.0);
+        soundFX.push(sound);
+    }
+    backingTrack = new SoundEffect(PATH + "audio/main.mp3", "main", 0.25);
+    backingTrack.fadeIn();
+    var loadedItems = 0;
     var white = THREE.ImageUtils.loadTexture(PATH + "textures/white.jpg", undefined, checkLoading);
     white.minFilter = white.magFilter = THREE.LinearFilter;
     var black = THREE.ImageUtils.loadTexture(PATH + "textures/black.jpg", undefined, checkLoading);
@@ -100,7 +112,6 @@ function blackbox(el, sources, size, cbs) {
     var dummyButton = document.createElement("div");
     var icons = document.createElement("div");
     addIcons();
-    var soundFX = [];
     var debounceResize;
     // var overlay = document.getElementById("overlay");
 
@@ -108,7 +119,7 @@ function blackbox(el, sources, size, cbs) {
     var isAnimating = false;
     function checkLoading() {
         ++loadedItems;
-        if (loadedItems >= 7) {
+        if (loadedItems >= (7 + 11)) {
             texture.image = img;
             texture.minFilter = texture.magFilter = THREE.LinearFilter;
             texture.needsUpdate = true;
@@ -158,21 +169,10 @@ function blackbox(el, sources, size, cbs) {
         }
 
     }
-    function createSoundEffects(effects){
-        if (!createjs.Sound.initializeDefaultPlugins()) {return;}
-        for(var i = 0; i < effects.length; i++){
-            var src = PATH + "audio/" + effects[i] + ".mp3";
-            var sound = new SoundEffect(src, effects[i], 1.0);
-            soundFX.push(sound);
-        }
-        backingTrack = new SoundEffect(PATH + "audio/main.mp3", "main", 0.25);
-        backingTrack.fadeIn();
-    }
-    function createEffect() {
-        shuffle(effects);
-        insertRevert(effects);
-        createSoundEffects(effects);
+    // function createSoundEffects(effects){
 
+    // }
+    function createEffect() {
         effectIndex = 0;    
         effect = new Effect(effects[effectIndex]);
         effect.init();
@@ -1221,7 +1221,8 @@ function blackbox(el, sources, size, cbs) {
         }
         this.handleLoad = function(event){
             this.loaded = true;
-            console.log(this.src + " loaded");
+            // console.log(this.src + " loaded");
+            checkLoading();
         }
         this.init();
 
